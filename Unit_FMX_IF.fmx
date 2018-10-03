@@ -1,7 +1,7 @@
-object Form2: TForm2
+object FMXImageProcessinForm: TFMXImageProcessinForm
   Left = 0
   Top = 0
-  Caption = 'Form2'
+  Caption = 'Image processing using FMX'
   ClientHeight = 638
   ClientWidth = 1017
   FormFactor.Width = 320
@@ -9,98 +9,114 @@ object Form2: TForm2
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMasterStyle = 0
-  object btn1: TButton
-    Position.X = 40.000000000000000000
-    Position.Y = 472.000000000000000000
-    Size.Width = 153.000000000000000000
-    Size.Height = 65.000000000000000000
+  object btn_Load: TButton
+    Position.X = 16.000000000000000000
+    Position.Y = 464.000000000000000000
+    Size.Width = 100.000000000000000000
+    Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
-    Text = 'btn1_show_infos'
-    OnClick = btn1Click
+    Text = 'Load Image'
+    OnClick = btn_LoadClick
   end
   object memo1: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
-    Position.X = 40.000000000000000000
-    Position.Y = 544.000000000000000000
-    Size.Width = 929.000000000000000000
-    Size.Height = 73.000000000000000000
+    Align = Bottom
+    Position.Y = 536.000000000000000000
+    Size.Width = 1017.000000000000000000
+    Size.Height = 102.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
-    Viewport.Width = 925.000000000000000000
-    Viewport.Height = 69.000000000000000000
-  end
-  object img_analysis: TImage
-    MultiResBitmap = <
-      item
-      end>
-    Position.X = 40.000000000000000000
-    Position.Y = 56.000000000000000000
-    Size.Width = 425.000000000000000000
-    Size.Height = 353.000000000000000000
-    Size.PlatformDefault = False
+    Viewport.Width = 1013.000000000000000000
+    Viewport.Height = 98.000000000000000000
   end
   object btn2: TButton
-    Position.X = 200.000000000000000000
-    Position.Y = 472.000000000000000000
-    Size.Width = 153.000000000000000000
-    Size.Height = 65.000000000000000000
+    Position.X = 136.000000000000000000
+    Position.Y = 464.000000000000000000
+    Size.Width = 100.000000000000000000
+    Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
-    Text = 'btn_rotate'
+    Text = 'rotate'
     OnClick = btn2Click
   end
-  object OutImage: TImage
-    MultiResBitmap = <
-      item
-      end>
-    Position.X = 520.000000000000000000
-    Position.Y = 56.000000000000000000
-    Size.Width = 433.000000000000000000
-    Size.Height = 353.000000000000000000
-    Size.PlatformDefault = False
-  end
   object btn3_alphaColor: TButton
-    Position.X = 504.000000000000000000
-    Position.Y = 472.000000000000000000
-    Size.Width = 145.000000000000000000
-    Size.Height = 57.000000000000000000
+    Position.X = 256.000000000000000000
+    Position.Y = 464.000000000000000000
+    Size.Width = 100.000000000000000000
+    Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
-    Text = 'btn3_alphaColor'
+    Text = 'alphaColor'
     OnClick = btn3_alphaColorClick
   end
-  object spnbx1: TSpinBox
+  object spnbx_parameter1: TSpinBox
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     TabOrder = 6
     Cursor = crIBeam
     Max = 1000.000000000000000000
-    Position.X = 384.000000000000000000
-    Position.Y = 472.000000000000000000
+    Position.X = 808.000000000000000000
+    Position.Y = 488.000000000000000000
+    Size.Width = 172.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
   end
   object btn3_RGB: TButton
-    Position.X = 672.000000000000000000
-    Position.Y = 472.000000000000000000
-    Size.Width = 145.000000000000000000
-    Size.Height = 57.000000000000000000
+    Position.X = 376.000000000000000000
+    Position.Y = 464.000000000000000000
+    Size.Width = 100.000000000000000000
+    Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 7
-    Text = 'btn3_RGB'
+    Text = 'RGB'
     OnClick = btn3_RGBClick
   end
   object btn_BlackWhite: TButton
-    Position.X = 832.000000000000000000
-    Position.Y = 472.000000000000000000
-    Size.Width = 129.000000000000000000
-    Size.Height = 57.000000000000000000
+    Position.X = 496.000000000000000000
+    Position.Y = 464.000000000000000000
+    Size.Width = 100.000000000000000000
+    Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 8
-    Text = 'btn_BlackWhite'
+    Text = 'BlackWhite'
     OnClick = btn_BlackWhiteClick
   end
   object dlgOpen1: TOpenDialog
     Left = 424
     Top = 552
+  end
+  object pnl1: TPanel
+    Align = Top
+    Size.Width = 1017.000000000000000000
+    Size.Height = 441.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 10
+    object img_analysis: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 40.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 425.000000000000000000
+      Size.Height = 353.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object OutImage: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 528.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 433.000000000000000000
+      Size.Height = 353.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
+  object Label1: TLabel
+    Position.X = 808.000000000000000000
+    Position.Y = 464.000000000000000000
+    Text = 'Parameter #1'
+    TabOrder = 12
   end
 end

@@ -21,66 +21,66 @@ uses
   FMX.Objects,
   FMX.Edit,
   FMX.EditBox,
-  FMX.SpinBox;
+  FMX.SpinBox,
+  Unit_Imageprocessing_functions;
 
 type
-  TForm2 = class( TForm )
-    btn1 : TButton;
+  TFMXImageProcessinForm = class( TForm )
+    btn_Load : TButton;
     memo1 : TMemo;
-    img_analysis : TImage;
     btn2 : TButton;
-    OutImage : TImage;
     btn3_alphaColor : TButton;
-    spnbx1 : TSpinBox;
+    spnbx_parameter1: TSpinBox;
     btn3_RGB : TButton;
     btn_BlackWhite : TButton;
-    dlgOpen1: TOpenDialog;
+    dlgOpen1 : TOpenDialog;
+    pnl1 : TPanel;
+    img_analysis : TImage;
+    OutImage : TImage;
+    Label1: TLabel;
     procedure FormCreate( Sender : TObject );
-    procedure btn1Click( Sender : TObject );
+    procedure btn_LoadClick( Sender : TObject );
     procedure btn2Click( Sender : TObject );
     procedure btn3_alphaColorClick( Sender : TObject );
     procedure btn3_RGBClick( Sender : TObject );
-    procedure btn_BlackWhiteClick(Sender: TObject);
+    procedure btn_BlackWhiteClick( Sender : TObject );
     private
-      procedure SingleChImage(
-        Bit              : TBitmap;
-        OpacityThreshold : integer );
-      procedure SingleChannelImage(
-        Bit : TBitmap;
-        c   : integer );
-      procedure BlackWhiteThresholdImage(
-        Bit : TBitmap;
-        c   : integer );
+
       { Private declarations }
     public
       { Public declarations }
       testbmp : TBitmap;
-      bmpFilename : String ;
+      bmpFilename : String;
   end;
 
 var
-  Form2 : TForm2;
+  FMXImageProcessinForm : TFMXImageProcessinForm;
 
 implementation
 
 {$R *.fmx}
 
-procedure TForm2.FormCreate( Sender : TObject );
+procedure TFMXImageProcessinForm.FormCreate( Sender : TObject );
   begin
     testbmp := TBitmap.Create;
   end;
 
-procedure TForm2.btn1Click( Sender : TObject );
+procedure TFMXImageProcessinForm.btn_LoadClick( Sender : TObject );
   begin
 
-    if dlgOpen1.Execute then
+    if dlgOpen1.Execute
+    then
 
-       begin
-            bmpFilename :=  dlgOpen1.FileName;
+      begin
+        bmpFilename := dlgOpen1.FileName;
 
-            img_analysis.Bitmap.LoadFromFile(bmpfilename);
-       end;
+        img_analysis.Bitmap.LoadFromFile( bmpFilename );
 
+        memo1.Lines.Add( 'Image file name : ' + bmpFilename );
+
+        memo1.Lines.Add( 'Bitmap Width x Height  : ' + img_analysis.Bitmap.Width.ToString + ' x' + img_analysis.Bitmap.Height.ToString + 'pixel' );
+
+      end;
 
     {$IFDEF FrameWork_VCL}
     memo1.Lines.Add( 'guess you are using VCL framework' );
@@ -88,186 +88,51 @@ procedure TForm2.btn1Click( Sender : TObject );
     {$IFDEF FrameWork_FMX}
     memo1.Lines.Add( 'guess you are using FMX framework' );
     {$ENDIF}
-
   end;
 
-procedure TForm2.btn2Click( Sender : TObject );
+procedure TFMXImageProcessinForm.btn2Click( Sender : TObject );
+var  rotMode : Integer  ;
   begin
+   memo1.Lines.Add( 'rotate the image ...' );
+
     testbmp.Assign( img_analysis.Bitmap );
-    testbmp.Rotate( 180 );
+
+    rotMode := Round( spnbx_parameter1.Value ) ;
+    case rotMode  of
+    0:  testbmp.Rotate( 0 );
+    1:  testbmp.Rotate( 90 );
+    2:  testbmp.Rotate( 180 );
+    3:  testbmp.Rotate( 270 );
+    else
+        testbmp.Rotate( 0 );
+    end;
+
     OutImage.Bitmap.Assign( testbmp );
 
   end;
 
-procedure TForm2.btn3_alphaColorClick( Sender : TObject );
+procedure TFMXImageProcessinForm.btn3_alphaColorClick( Sender : TObject );
   begin
+      memo1.Lines.Add( 'adjust alpha color image ...' );
     testbmp.Assign( img_analysis.Bitmap );
-    SingleChImage( testbmp, round( spnbx1.value ) );
+    AlphaColorImage( testbmp, round( spnbx_parameter1.value ) );
     OutImage.Bitmap.Assign( testbmp );
   end;
 
-procedure TForm2.btn3_RGBClick( Sender : TObject );
+procedure TFMXImageProcessinForm.btn3_RGBClick( Sender : TObject );
   begin
+     memo1.Lines.Add( 'select RGB channel  [Value 1...3]' );
     testbmp.Assign( img_analysis.Bitmap );
-    SingleChannelImage( testbmp, round( spnbx1.value ) );
+    SingleColorChannelImage( testbmp, round( spnbx_parameter1.value ) );
     OutImage.Bitmap.Assign( testbmp );
   end;
 
-Function GetPixel(
-  i, j        : integer;
-  bitdata     : TBitmapData;
-  PixelFormat : TPixelFormat ) : TAlphaColor;
+procedure TFMXImageProcessinForm.btn_BlackWhiteClick( Sender : TObject );
   begin
-
-    result := PixelToAlphaColor( @PAlphaColorArray( bitdata.Data )
-      [ j * ( bitdata.Pitch div PixelFormatBytes[ PixelFormat ] ) + 1 * i ],
-      PixelFormat );
-  end;
-
-procedure SetPixel(
-  color       : TAlphaColor;
-  i, j        : integer;
-  bitdata     : TBitmapData;
-  PixelFormat : TPixelFormat );
-  begin
-    AlphaColorToPixel( color, @PAlphaColorArray( bitdata.Data )
-      [ j * ( bitdata.Pitch div PixelFormatBytes[ PixelFormat ] ) + 1 * i ],
-      PixelFormat );
-
-  end;
-
-procedure TForm2.SingleChImage(
-  Bit              : TBitmap;
-  OpacityThreshold : integer );
-  var
-    bitdata1 : TBitmapData;
-    i : integer;
-    j : integer;
-    color : TAlphaColor;
-  begin
-    if ( Bit.Map( TMapAccess.maReadWrite, bitdata1 ) )
-    then
-      try
-        for i := 0 to Bit.width - 1 do
-          for j := 0 to Bit.height - 1 do
-            begin
-              begin
-                color := GetPixel( i, j, bitdata1, Bit.PixelFormat );
-
-                if TAlphaColorRec( color ).A < OpacityThreshold
-                then
-                  begin
-                    TAlphaColorRec( color ).A := 0;
-
-                    SetPixel( color, i, j, bitdata1, Bit.PixelFormat );
-                  end;
-              end;
-            end;
-      finally
-        Bit.Unmap( bitdata1 );
-      end;
-  end;
-
-procedure TForm2.SingleChannelImage(
-  Bit : TBitmap;
-  c   : integer );
-  var
-    bitdata1 : TBitmapData;
-    i : integer;
-    j : integer;
-    color : TAlphaColor;
-  begin
-    if ( Bit.Map( TMapAccess.maReadWrite, bitdata1 ) )
-    then
-      try
-        for i := 0 to Bit.width - 1 do
-          for j := 0 to Bit.height - 1 do
-            begin
-              begin
-                color := GetPixel( i, j, bitdata1, Bit.PixelFormat );
-
-                case c of
-                  1 :
-                    begin
-                      TAlphaColorRec( color ).B := 0;
-                      TAlphaColorRec( color ).G := 0;
-                    end;
-                  2 :
-                    begin
-                      TAlphaColorRec( color ).R := 0;
-                      TAlphaColorRec( color ).G := 0;
-                    end;
-
-                  3 :
-                    begin
-                      TAlphaColorRec( color ).B := 0;
-                      TAlphaColorRec( color ).R := 0;
-                    end;
-
-                end;
-
-                SetPixel( color, i, j, bitdata1, Bit.PixelFormat );
-
-              end;
-            end;
-      finally
-        Bit.Unmap( bitdata1 );
-      end;
-  end;
-
-procedure TForm2.BlackWhiteThresholdImage(
-  Bit : TBitmap;
-  c   : integer );
-  var
-    bitdata1 : TBitmapData;
-    i : integer;
-    j : integer;
-    color : TAlphaColor;
-    Cquer : integer;
-  begin
-    if ( Bit.Map( TMapAccess.maReadWrite, bitdata1 ) )
-    then
-      try
-        for i := 0 to Bit.width - 1 do
-          for j := 0 to Bit.height - 1 do
-            begin
-              begin
-                color := GetPixel( i, j, bitdata1, Bit.PixelFormat );
-
-                Cquer := round( TAlphaColorRec( color ).B * 0.3 +
-                  TAlphaColorRec( color ).R * 0.59 + TAlphaColorRec( color )
-                  .G * 0.11 );
-
-                if ( Cquer ) > c
-                then
-                  begin
-                    TAlphaColorRec( color ).R := 255;
-                    TAlphaColorRec( color ).G := 255;
-                    TAlphaColorRec( color ).B := 255;
-                  end
-                else
-                  begin
-                    TAlphaColorRec( color ).R := 0;
-                    TAlphaColorRec( color ).G := 0;
-                    TAlphaColorRec( color ).B := 0;
-                  end;
-
-                SetPixel( color, i, j, bitdata1, Bit.PixelFormat );
-
-              end;
-
-            end;
-
-      finally
-        Bit.Unmap( bitdata1 );
-      end;
-  end;
-
-procedure TForm2.btn_BlackWhiteClick(Sender: TObject);
-begin
-        testbmp.Assign( img_analysis.Bitmap );
-   BlackWhiteThresholdImage( testbmp, round( spnbx1.value ) );
+    memo1.Lines.Add( 'set image threshold  [Value 0...255]' );
+    testbmp.Assign( img_analysis.Bitmap );
+    BlackWhiteThresholdImage( testbmp, round( spnbx_parameter1.value ) );
     OutImage.Bitmap.Assign( testbmp );
-end;
+  end;
 
 end.
